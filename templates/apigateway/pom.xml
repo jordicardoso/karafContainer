@@ -20,13 +20,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>marem.karaf.sandbox</groupId>
-    <artifactId>karaf-sandbox-distribution</artifactId>
+    <groupId>bonpreu.karaf.distribution</groupId>
+    <artifactId>karaf-distribution</artifactId>
     <version>1.0.0</version>
     <packaging>karaf-assembly</packaging>
 
-    <name>karaf-sandbox-distribution-feature</name>
-    <description>karaf-sandbox-distribution details</description>
+    <name>karaf-distribution-feature</name>
 
     <properties>
         <activemq.version>5.15.12</activemq.version>

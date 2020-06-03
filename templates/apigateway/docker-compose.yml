@@ -2,19 +2,23 @@ version: '3.2'
 services:
   karaf:    
     container_name: apigatewaybp
-    #restart: on-failure
+    restart: on-failure
     environment:
       - PROP_FILE_SMX=etc/bpconfig.properties
-      - JAVA_MAX_MEM=${JAVA_MAX_MEM}
+      - JAVA_MAX_MEM=24G
+    extra_hosts:
+      - "apigateway:${HOST_IP}"
+      - "ospAPI:${HOST_IP}"
+      - "ospLogin:${HOST_IP}"
     build: 
       context: .
     volumes:
       - m2repo:/root/.m2
       - /etc/localtime:/etc/localtime:ro      
-      - ./deploy:/datastore/apigatewaybp//deploy:rw
-      - ./camel:/datastore/apigatewaybp/camel:rw
-      - ./data:/datastore/apigatewaybp/data:rw
-      - ./etc:/datastore/apigatewaybp/etc:rw
+      - /datastore/karaf/deploy:/opt/karaf/deploy:rw
+      - /datastore/karaf/camel:/opt/karaf/camel:rw
+      - /datastore/karaf/data:/opt/karaf/data:rw
+      - /datastore/karaf/etc:/opt/karaf/etc:rw
     ports:
       - 1099:1099
       - 8101:8101
@@ -23,6 +27,12 @@ services:
       - 8282:8282
     stdin_open: true
     tty: true
+    network_mode: bridge
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://karaf:karaf@localhost:8181/system/console/bundles"]
+      interval: 30s
+      timeout: 2s
+      retries: 15
 
 volumes:
   m2repo:
