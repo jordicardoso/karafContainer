@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!--
+      Licensed to the Apache Software Foundation (ASF) under one or more
+      contributor license agreements.  See the NOTICE file distributed with
+      this work for additional information regarding copyright ownership.
+      The ASF licenses this file to You under the Apache License, Version 2.0
+      (the "License"); you may not use this file except in compliance with
+      the License.  You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    -->
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>marem.karaf.sandbox</groupId>
+    <artifactId>karaf-sandbox-distribution</artifactId>
+    <version>1.0.0</version>
+    <packaging>karaf-assembly</packaging>
+
+    <name>karaf-sandbox-distribution-feature</name>
+    <description>karaf-sandbox-distribution details</description>
+
+    <properties>
+        <activemq.version>5.15.9</activemq.version>
+        <camel.version>2.25.0</camel.version>
+        <karaf.version>4.2.8</karaf.version>
+        <hawtio.version>2.9.0</hawtio.version>
+    </properties>
+
+    <repositories>
+        <!-- Apache ServiceMix repository (for region) -->
+        <repository>
+            <id>apache.servicemix.m2</id>
+            <name>Apache ServiceMix M2 repository</name>
+            <url>http://svn.apache.org/repos/asf/servicemix/m2-repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- OPS4J SNAPSHOT repository -->
+        <repository>
+            <id>ops4j.sonatype.snapshots.deploy</id>
+            <name>OPS4J snapshot repository</name>
+            <url>https://oss.sonatype.org/content/repositories/ops4j-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <!-- Apache SNAPSHOT -->
+        <repository>
+            <id>apache.snapshots.deploy</id>
+            <name>Apache snapshot repository</name>
+            <url>https://repository.apache.org/content/groups/snapshots-group</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Apache Camel -->
+        <dependency>
+            <groupId>org.apache.camel.karaf</groupId>
+            <artifactId>apache-camel</artifactId>
+            <version>${camel.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Apache ActiveMQ -->
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-karaf</artifactId>
+            <version>${activemq.version}</version>
+            <type>xml</type>
+            <classifier>features</classifier>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- hawtio -->
+        <dependency>
+            <groupId>io.hawt</groupId>
+            <artifactId>hawtio-karaf</artifactId>
+            <version>${hawtio.version}</version>
+            <classifier>features</classifier>
+            <scope>runtime</scope>
+            <type>xml</type>
+        </dependency>
+
+        <!-- karaf -->
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>framework</artifactId>
+            <version>${karaf.version}</version>
+            <type>kar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>standard</artifactId>
+            <version>${karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>spring</artifactId>
+            <version>${karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.karaf.features</groupId>
+            <artifactId>enterprise</artifactId>
+            <version>${karaf.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/filtered-resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.karaf.tooling</groupId>
+                    <artifactId>karaf-maven-plugin</artifactId>
+                    <version>${karaf.version}</version>
+                    <extensions>true</extensions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>process-resources</id>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-maven-plugin</artifactId>
+                <configuration>
+                    <startupFeatures>
+                        <feature>eventadmin</feature>
+                    </startupFeatures>
+                    <bootFeatures>
+                        <feature>wrap</feature>
+                        <feature>aries-blueprint</feature>
+                        <feature>shell</feature>
+                        <feature>shell-compat</feature>
+                        <feature>feature</feature>
+                        <feature>jaas</feature>
+                        <feature>ssh</feature>
+                        <feature>management</feature>
+                        <feature>bundle</feature>
+                        <feature>config</feature>
+                        <feature>deployer</feature>
+                        <feature>diagnostic</feature>
+                        <feature>feature</feature>
+                        <feature>instance</feature>
+                        <feature>kar</feature>
+                        <feature>log</feature>
+                        <feature>package</feature>
+                        <feature>service</feature>
+                        <feature>system</feature>
+			<feature>obr</feature>
+			<feature>jdbc</feature>
+			<feature>transaction</feature>
+                        <feature>camel</feature>
+			<feature>camel-core</feature>
+			<feature>camel-spring</feature>
+                        <feature>camel-blueprint</feature>
+                        <feature>camel-jms</feature>
+                        <feature>camel-csv</feature>
+                        <feature>camel-elasticsearch</feature>
+			<feature>camel-exec</feature>
+			<feature>camel-ftp</feature>
+			<feature>camel-groovy</feature>
+			<feature>camel-http4</feature>
+			<feature>camel-jackson</feature>
+			<feature>camel-jdbc</feature>
+			<feature>camel-jetty</feature>
+			<feature>camel-jsonpath</feature>
+			<feature>camel-mail</feature>
+			<feature>camel-quartz</feature>
+			<feature>camel-saxon</feature>
+			<feature>camel-sql</feature>
+			<feature>camel-swagger-java</feature>
+			<feature>camel-velocity</feature>
+			<feature>camel-websocket</feature>
+			<feature>camel-xmljson</feature>
+			<feature>camel-zipfile</feature>
+			<feature>camel-base64</feature>
+                        <feature>camel-crypto-cms</feature>
+                        <feature>camel-ldap</feature>
+                        <feature>camel-json-validator</feature>
+                        <feature>camel-ognl</feature>
+                        <feature>camel-script-groovy</feature>
+                        <feature>camel-velocity</feature>
+                        <feature>camel-jolt</feature>
+                        <feature>activemq-camel</feature>
+			<feature>activemq-broker</feature>
+			<feature>activemq-web-console</feature>
+                        <feature>activemq-blueprint</feature>
+			<feature>hawtio</feature>
+			<feature>decanter-collector-log</feature>
+                        <feature>decanter-collector-jmx-camel</feature>
+                        <feature>decanter-appender-elasticsearch</feature>
+                        <feature>pax-jdbc-postgresql</feature>
+                    </bootFeatures>
+                    <javase>1.8</javase>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
