@@ -1,0 +1,27 @@
+version: '3.2'
+services:
+  karaf:    
+    container_name: mediador
+    #restart: on-failure
+    environment:
+      - PROP_FILE_SMX=etc/bpconfig.properties
+      - JAVA_MAX_MEM=${JAVA_MAX_MEM}
+    build: 
+      context: .
+    volumes:
+      - m2repo:/root/.m2
+      - /etc/localtime:/etc/localtime:ro      
+      - ./deploy:/opt/karaf/deploy:rw
+      - ./camel:/opt/karaf/camel:rw
+      - ./data:/opt/karaf/data:rw       
+    ports:
+      - 1099:1099
+      - 8101:8101
+      - 44444:44444
+      - 8181:8181
+      - 8282:8282
+    stdin_open: true
+    tty: true
+
+volumes:
+  m2repo:
