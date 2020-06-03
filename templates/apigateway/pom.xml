@@ -29,9 +29,9 @@
     <description>karaf-sandbox-distribution details</description>
 
     <properties>
-        <activemq.version>5.15.9</activemq.version>
-        <camel.version>2.25.0</camel.version>
-        <karaf.version>4.2.8</karaf.version>
+        <activemq.version>5.15.12</activemq.version>
+	<camel.version>2.25.1</camel.version>
+	<karaf.version>4.2.8</karaf.version>
         <hawtio.version>2.9.0</hawtio.version>
     </properties>
 
@@ -121,7 +121,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.karaf.features</groupId>
-            <artifactId>spring</artifactId>
+            <artifactId>spring-legacy</artifactId>
             <version>${karaf.version}</version>
             <classifier>features</classifier>
             <type>xml</type>
@@ -240,15 +240,18 @@
                         <feature>camel-script-groovy</feature>
                         <feature>camel-velocity</feature>
                         <feature>camel-jolt</feature>
-                        <feature>activemq-camel</feature>
-			<feature>activemq-broker</feature>
+			<feature>activemq-camel</feature>
+			<feature>activemq-broker-noweb</feature>
 			<feature>activemq-web-console</feature>
                         <feature>activemq-blueprint</feature>
 			<feature>hawtio</feature>
 			<feature>decanter-collector-log</feature>
                         <feature>decanter-collector-jmx-camel</feature>
-                        <feature>decanter-appender-elasticsearch</feature>
-                        <feature>pax-jdbc-postgresql</feature>
+			<feature>decanter-appender-elasticsearch</feature>
+			<feature>pax-jdbc-config</feature>
+			<feature>pax-jdbc-pool-dbcp2</feature>
+			<feature>pax-jdbc-postgresql</feature>
+			<feature>pax-jdbc-jtds</feature>
                     </bootFeatures>
                     <javase>1.8</javase>
                 </configuration>

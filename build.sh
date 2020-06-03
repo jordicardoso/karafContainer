@@ -3,29 +3,22 @@
 usage() {
   cat <<HERE
 Usage:
+  build.sh --template <name> 
   build.sh --help
-  build.sh --template <name> --karaf-version <x.x.x> --image-name <image>
-  If the --image-name flag is not used the built image name will be 'karaf'.
-  If the --karaf-version flag is not used the version will be 'latest'
-  templates: mediador, wmos, apigateway
+  templates: ${TEMPLATES} 
+  camel versions: 2.20.0-4, 2.21.0-5, 2.22.0-5, 2.23.0-4, 2.24.0-3, 2.25.0-1, 3.0.0-1, 3.1.0, 3.2.0, 3.3.0
+  karaf versions java8:  4.1.7
+  karaf versions java11: 4.2.8
 HERE
   exit 1
 }
 
-while [ $# -ge 1 ]
-do
+TEMPLATES=`find ./templates -mindepth 1 -maxdepth 1 -printf '%f '`
+
 key="$1"
   case $key in
     --template)
     TEMPLATE_NAME="$2"
-    shift
-    ;;	  
-    --image-name)
-    IMAGE_NAME="$2"
-    shift
-    ;;
-    --karaf-version)
-    KARAF_VERSION="$2"
     shift
     ;;
     --help)
@@ -33,52 +26,10 @@ key="$1"
     ;;
     *)
     # unknown option
+    usage
     ;;
   esac
-  shift
-done
 
-IMAGE_NAME=${IMAGE_NAME:-karaf}
-
-# TMPDIR must be contained within the working directory so it is part of the
-# Docker context. (i.e. it can't be mktemp'd in /tmp)
-TMPDIR=_TMP_
-
-cleanup() {
-    rm -rf "${TMPDIR}"
-}
-trap cleanup EXIT
-
-mkdir -p "${TMPDIR}"
-
-if [ -n "${FROM_RELEASE}" ]; then
-
-  [ -n "${KARAF_VERSION}" ] || usage
-
-  KARAF_BASE_URL="$(curl -s https://www.apache.org/dyn/closer.cgi\?preferred\=true)karaf/${KARAF_VERSION}/"
-  KARAF_DIST_FILE_NAME="apache-karaf-${KARAF_VERSION}.tar.gz"
-  CURL_OUTPUT="${TMPDIR}/${KARAF_DIST_FILE_NAME}"
-
-  echo "Downloading ${KARAF_DIST_FILE_NAME} from ${KARAF_BASE_URL}"
-  curl -s ${KARAF_BASE_URL}${KARAF_DIST_FILE_NAME} --output ${CURL_OUTPUT}
-
-  KARAF_DIST="${CURL_OUTPUT}"
-
-elif [ -n "${FROM_LOCAL}" ]; then
-
-  if [ -n "${ARCHIVE}" ]; then
-     DIST_DIR=${ARCHIVE}
-  else 
-     DIST_DIR=../apache-karaf/target/apache-karaf-*.tar.gz
-  fi
-  KARAF_DIST=${TMPDIR}/apache-karaf.tar.gz
-  echo "Using karaf dist: ${DIST_DIR}"
-  cp ${DIST_DIR} ${KARAF_DIST}
-
-else
-
-  usage
-
-fi
-
-docker build --build-arg karaf_dist="${KARAF_DIST}" -t "${IMAGE_NAME}" .
+echo "Building ${TEMPLATE_NAME} container"
+cd ./templates/${TEMPLATE_NAME}
+docker-compose up -d

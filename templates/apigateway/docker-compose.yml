@@ -1,112 +1,28 @@
 version: '3.2'
 services:
-  karaf:
-    container_name: mediador
+  karaf:    
+    container_name: apigatewaybp
     #restart: on-failure
     environment:
-      - JAVA_MAX_MEM=12G
-    build: .
+      - PROP_FILE_SMX=etc/bpconfig.properties
+      - JAVA_MAX_MEM=${JAVA_MAX_MEM}
+    build: 
+      context: .
     volumes:
       - m2repo:/root/.m2
       - /etc/localtime:/etc/localtime:ro      
-      - ./karaf/etc:/opt/karaf/etc:rw
-      - ./deploy:/opt/karaf/deploy:rw
-      - ./camel:/opt/karaf/camel:rw
-      - ./data:/opt/karaf/data:rw
-      - ./org.apache.felix.fileinstall-deployds.cfg:/opt/karaf/etc/org.apache.felix.fileinstall-deployds.cfg:rw
-      - ./org.ops4j.pax.logging.cfg:/opt/karaf/etc/org.ops4j.pax.logging.cfg
+      - ./deploy:/datastore/apigatewaybp//deploy:rw
+      - ./camel:/datastore/apigatewaybp/camel:rw
+      - ./data:/datastore/apigatewaybp/data:rw
+      - ./etc:/datastore/apigatewaybp/etc:rw
     ports:
       - 1099:1099
       - 8101:8101
-      - 4444:4444
+      - 44444:44444
       - 8181:8181
       - 8282:8282
     stdin_open: true
     tty: true
-
-  activemqTx:
-    image: rmohr/activemq:5.15.6
-    container_name: karaf-amqTx
-    restart: on-failure
-    ports:
-      - 61616:61616
-      - 8161:8161
-    volumes:
-      - ./activemqTx/conf:/opt/activemq/conf:rw
-      - ./activemqTx/data:/opt/activemq/data:rw
-      - /etc/localtime:/etc/localtime:ro
-    network_mode: bridge
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://admin:admin@${HOST_IP}:8161/api/jolokia/read/org.apache.activemq:type=Broker,brokerName=localhost,service=Health"]
-      interval: 5s
-      timeout: 2s
-      retries: 15
-
-  elasticsearch:
-    image:  docker.elastic.co/elasticsearch/elasticsearch:7.5.1
-    container_name: karaf-elastic
-    ports:
-      - '9200:9200'
-      - '9300:9300'
-    environment:
-      - xpack.security.enabled=false
-      - xpack.monitoring.enabled=false
-      - xpack.ml.enabled=false
-      - xpack.graph.enabled=false
-      - xpack.watcher.enabled=false
-      - bootstrap.memory_lock=true
-      - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g
-      - cluster.name=elasticsearch
-      - discovery.zen.ping.unicast.hosts=${CLUSTER_IPS}
-      - discovery.zen.minimum_master_nodes=1
-      - network.publish_host=${HOST_IP}
-      - cluster.routing.allocation.disk.threshold_enabled=false
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    healthcheck:
-        test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cat/health || exit 1"]
-        interval: 30s
-        timeout: 30s
-        retries: 3
-    volumes:
-      - ./elasticsearch/data:/usr/share/elasticsearch/data:rw
-      - /etc/localtime:/etc/localtime:ro
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.5.1
-    container_name: karaf-kibana
-    ports: ['5601:5601']
-    depends_on: ['elasticsearch']
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-
-  apm-server:
-    image: docker.elastic.co/apm/apm-server:7.5.1
-    container_name: karaf-apm
-    ports:
-      - "8200:8200"
-      - "6060:6060"
-    command: >
-      apm-server -e
-        -E apm-server.rum.enabled=true
-        -E apm-server.host=0.0.0.0:8200
-        -E setup.kibana.host=${HOST_IP}:5601
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - DAC_OVERRIDE
-      - SETGID
-      - SETUID
-    logging:
-      driver: 'json-file'
-      options:
-          max-size: '2m'
-          max-file: '5'
-    depends_on: ['elasticsearch']
 
 volumes:
   m2repo:
